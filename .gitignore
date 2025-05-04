@@ -21,6 +21,7 @@ core
 *.pyc
 # OSX system files
 .DS_store
+.vscode/
 
 /doc/_build/
 
