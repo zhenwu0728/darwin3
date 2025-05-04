@@ -43,6 +43,7 @@ C  myThid :: thread number
       _RL mortTempFunc
       _RL mort2TempFunc
       _RL omegaCl
+      _RL dTsubk
       _RL myTime
       INTEGER k_debug
       INTEGER myThid, myIter
