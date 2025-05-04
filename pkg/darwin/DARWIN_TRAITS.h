@@ -72,7 +72,6 @@ C     mort2              :: [(mmol C m^-3)^-1 s^-1]    quadratic mortality coeff
 C     ExportFracMort     :: []                         fraction of linear mortality to POM
 C     ExportFracMort2    :: []                         fraction of quadratic mortality to POM
 C     ExportFracExude    :: []                         fraction of exudation to POM
-C     FracExudeC         :: []                         fraction of excess C exuded
 C
 C- temperature dependence:
 C     phytoTempCoeff     :: []                         see :numref:`pkg_darwin_temperature_params`
@@ -171,7 +170,6 @@ C     ksatDOFe           :: [mmol Fe m^-3]  half-saturation of DOFe for bacteria
      &    ExportFracMort,
      &    ExportFracMort2,
      &    ExportFracExude,
-     &    FracExudeC,
      &    phytoTempCoeff,
      &    phytoTempExp1,
      &    phytoTempAe,
@@ -254,7 +252,6 @@ C     ksatDOFe           :: [mmol Fe m^-3]  half-saturation of DOFe for bacteria
       _RL ExportFracMort(nplank)
       _RL ExportFracMort2(nplank)
       _RL ExportFracExude(nplank)
-      _RL FracExudeC(nplank)
       _RL phytoTempCoeff(nplank)
       _RL phytoTempExp1(nplank)
       _RL phytoTempAe(nplank)

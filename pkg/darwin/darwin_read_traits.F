@@ -52,7 +52,6 @@
      &    ExportFracMort,
      &    ExportFracMort2,
      &    ExportFracExude,
-     &    FracExudeC,
      &    phytoTempCoeff,
      &    phytoTempExp1,
      &    phytoTempAe,

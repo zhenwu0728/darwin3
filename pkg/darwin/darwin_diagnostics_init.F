@@ -108,41 +108,6 @@ C---+----1----+----2----+----3----+----4----+----5----+----6----+----7-|--+----|
       diagCode  = 'SM P    MR      '
       CALL DIAGNOSTICS_ADDTOLIST( diagNum,
      I           diagName, diagCode, diagUnits, diagTitle, 0, myThid )
-
-      WRITE(diagName,'(A)')'DmdN'
-      WRITE(diagTitle,'(A)')'Carbon demand from N limit'
-      diagUnits = 'mmol C/m^3/s    '
-      diagCode  = 'SM P    MR      '
-      CALL DIAGNOSTICS_ADDTOLIST( diagNum,
-     I           diagName, diagCode, diagUnits, diagTitle, 0, myThid )
-
-      WRITE(diagName,'(A)')'DmdP'
-      WRITE(diagTitle,'(A)')'Carbon demand from P limit'
-      diagUnits = 'mmol C/m^3/s    '
-      diagCode  = 'SM P    MR      '
-      CALL DIAGNOSTICS_ADDTOLIST( diagNum,
-     I           diagName, diagCode, diagUnits, diagTitle, 0, myThid )
-
-      WRITE(diagName,'(A)')'DmdFe'
-      WRITE(diagTitle,'(A)')'Carbon demand from Fe limit'
-      diagUnits = 'mmol C/m^3/s    '
-      diagCode  = 'SM P    MR      '
-      CALL DIAGNOSTICS_ADDTOLIST( diagNum,
-     I           diagName, diagCode, diagUnits, diagTitle, 0, myThid )
-
-      WRITE(diagName,'(A)')'DmdSi'
-      WRITE(diagTitle,'(A)')'Carbon demand from Si limit'
-      diagUnits = 'mmol C/m^3/s    '
-      diagCode  = 'SM P    MR      '
-      CALL DIAGNOSTICS_ADDTOLIST( diagNum,
-     I           diagName, diagCode, diagUnits, diagTitle, 0, myThid )
-
-      WRITE(diagName,'(A)')'Dmdmin'
-      WRITE(diagTitle,'(A)')'Minimum carbon demand'
-      diagUnits = 'mmol C/m^3/s    '
-      diagCode  = 'SM P    MR      '
-      CALL DIAGNOSTICS_ADDTOLIST( diagNum,
-     I           diagName, diagCode, diagUnits, diagTitle, 0, myThid )
 #endif
 
 #ifdef ALLOW_RADTRANS
@@ -533,55 +498,6 @@ C-      use units & names from data.ptracers :
       DO j = 1, nPhoto
         WRITE(diagName,'(A,I4.4)')'BS',j
         WRITE(diagTitle,'(A,I4)')'Biosynthesis rate plankton ',j
-        diagUnits = 'mmol C/m^3/s    '
-        diagCode  = 'SMRP    MR      '
-        CALL DIAGNOSTICS_ADDTOLIST( diagNum,
-     I             diagName, diagCode, diagUnits, diagTitle, 0, myThid )
-      ENDDO
-
-      DO j = 1, nPhoto
-        WRITE(diagName,'(A,I4.4)')'DN',j
-        WRITE(diagTitle,'(A,I4)')
-     &        'Carbon demand from N limit plankton ',j
-        diagUnits = 'mmol C/m^3/s    '
-        diagCode  = 'SMRP    MR      '
-        CALL DIAGNOSTICS_ADDTOLIST( diagNum,
-     I             diagName, diagCode, diagUnits, diagTitle, 0, myThid )
-      ENDDO
-
-      DO j = 1, nPhoto
-        WRITE(diagName,'(A,I4.4)')'DP',j
-        WRITE(diagTitle,'(A,I4)')
-     &        'Carbon demand from P limit plankton ',j
-        diagUnits = 'mmol C/m^3/s    '
-        diagCode  = 'SMRP    MR      '
-        CALL DIAGNOSTICS_ADDTOLIST( diagNum,
-     I             diagName, diagCode, diagUnits, diagTitle, 0, myThid )
-      ENDDO
-
-      DO j = 1, nPhoto
-        WRITE(diagName,'(A,I4.4)')'DFe',j
-        WRITE(diagTitle,'(A,I4)')
-     &        'Carbon demand from Fe limit plankton ',j
-        diagUnits = 'mmol C/m^3/s    '
-        diagCode  = 'SMRP    MR      '
-        CALL DIAGNOSTICS_ADDTOLIST( diagNum,
-     I             diagName, diagCode, diagUnits, diagTitle, 0, myThid )
-      ENDDO
-
-      DO j = 1, nPhoto
-        WRITE(diagName,'(A,I4.4)')'DSi',j
-        WRITE(diagTitle,'(A,I4)')
-     &        'Carbon demand from Si limit plankton ',j
-        diagUnits = 'mmol C/m^3/s    '
-        diagCode  = 'SMRP    MR      '
-        CALL DIAGNOSTICS_ADDTOLIST( diagNum,
-     I             diagName, diagCode, diagUnits, diagTitle, 0, myThid )
-      ENDDO
-
-      DO j = 1, nPhoto
-        WRITE(diagName,'(A,I4.4)')'Dmin',j
-        WRITE(diagTitle,'(A,I4)')'Minimum carbon demand plankton ',j
         diagUnits = 'mmol C/m^3/s    '
         diagCode  = 'SMRP    MR      '
         CALL DIAGNOSTICS_ADDTOLIST( diagNum,

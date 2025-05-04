@@ -240,11 +240,6 @@ c !LOCAL VARIABLES: ====================================================
 #endif
 
 #ifdef DARWIN_ALLOW_CSTORE
-      _RL Dmd_NC
-      _RL Dmd_PC
-      _RL Dmd_SiC
-      _RL Dmd_FeC
-      _RL Dmd_min
       _RL excretC
       _RL excC
       _RL storeC
@@ -465,16 +460,6 @@ C       to not use PO4, ..., set ksatPO4=0 and vmaxPO4=0 (if DARWIN_ALLOW_PQUOTA
 C       or R_PC=0 (if not)
 C       the result will be limitp = 1, uptakePO4 = 0
 
-C       CSTORE/exudation:
-C       Dmd_XC means the amount of carbon needed for biosynthesis when X
-C       is the limiting nutrient.  To find the lowest demand (maximum
-C       achievable growth rate), start with a large value.  Quota
-C       elements will be handled further down in a dedicatd CSTORE
-C       section.
-#ifdef DARWIN_ALLOW_CSTORE
-        Dmd_min = HUGE(Dmd_min)
-#endif
-
 c phosphorus
         IF (ksatPO4(j) .GT. 0 _d 0) THEN
           MM_PO4 = PO4/(PO4 + ksatPO4(j))
@@ -491,17 +476,7 @@ c       normalized Droop limitation
         limitp = MIN(1 _d 0, (1.0-Qpmin(j)/MAX(Qpmin(j), Qp(j)))/
      &                       (1.0-Qpmin(j)/Qpmax(j)))
 #else /* no PQUOTA */
-# ifdef DARWIN_ALLOW_CSTORE
-        IF (R_PC(j) .GT. 0 _d 0) THEN
-          Dmd_PC = vmaxPO4(j)*MM_PO4*uptakeTempFunc*X(j)/R_PC(j)
-          Dmd_min = MIN(Dmd_min, Dmd_PC)
-        ELSE
-C       set to zero to avoid floating point error in diagonstic
-          Dmd_PC = 0 _d 0
-        ENDIF
-# else
         limitp = MM_PO4
-# endif
 #endif /* pquota */
 
 c silica
@@ -519,16 +494,7 @@ c       linear limitation
         limitsi = MAX(0 _d 0, MIN(1 _d 0, (Qsi(j) - Qsimin(j))/
      &                                    (Qsimax(j) - Qsimin(j)) ))
 #else /* no SIQUOTA */
-# ifdef DARWIN_ALLOW_CSTORE
-        IF (R_SiC(j) .GT. 0 _d 0) THEN
-          Dmd_SiC = VmaxSiO2(j)*MM_SiO2*uptakeTempFunc*X(j)/R_SiC(j)
-          Dmd_min = MIN(Dmd_min, Dmd_SiC)
-        ELSE
-          Dmd_SiC = 0 _d 0
-        ENDIF
-# else
         limitsi = MM_SiO2
-# endif
 #endif
 
 c iron
@@ -547,16 +513,7 @@ c       normalized Droop limitation
      &                        (1.0-Qfemin(j)/Qfemax(j)))
 #else /* no FEQUOTA */
 C iron limit is applied in Geider
-# ifdef DARWIN_ALLOW_CSTORE
-        IF (R_FeC(j) .GT. 0 _d 0) THEN
-          Dmd_FeC = vmaxFeT(j)*MM_FeT*uptakeTempFunc*X(j)/R_FeC(j)
-          Dmd_min = MIN(Dmd_min, Dmd_FeC)
-        ELSE
-          Dmd_FeC = 0 _d 0
-        ENDIF
-# else
         limitfe = MM_FeT
-# endif
 #endif
 
 c nitrogen
@@ -602,35 +559,15 @@ C       normalize to sum 1
           fracNO2 = 0 _d 0
           fracNO3 = 0 _d 0
         ENDIF
-# ifdef DARWIN_ALLOW_CSTORE
-C       compute maximum N uptake and C demand by N
-        uptakeNH4 = vmaxNH4(j)*limitNH4*uptakeTempFunc*X(j)
-        uptakeNO2 = vmaxNO2(j)*limitNO2*uptakeTempFunc*X(j)
-        uptakeNO3 = vmaxNO3(j)*limitNO3*uptakeTempFunc*X(j)
-        uptakeN = MAX(uptakeNH4 + uptakeNO2 + uptakeNO3,
-     &                VmaxN(j)*uptakeTempFunc*diazo(j)*X(j))
-        IF (R_NC(j) .GT. 0 _d 0) THEN
-          Dmd_NC = uptakeN/R_NC(j)
-          Dmd_min = MIN(Dmd_min, Dmd_NC)
-        ELSE
-          Dmd_NC = 0 _d 0
-        ENDIF
-# endif
 C if diazo, all fracN* == 0 but want no N limitation
         limitn = MIN(1 _d 0, limitn)
         IF (diazo(j) .GT. 0) THEN
           limitn = 1 _d 0
         ENDIF
 #endif /* DARWIN_ALLOW_NQUOTA */
-
-#ifdef DARWIN_ALLOW_CSTORE
-C       will apply limits for quota elements to growth rate instead
-        limitnut = 1 _d 0
-#else
         limitnut = MIN(limitn, limitp, limitsi)
 #if !(defined DARWIN_ALLOW_GEIDER && defined DARWIN_ALLOW_FEQUOTA)
         limitnut = MIN(limitnut, limitfe)
-#endif
 #endif
 
         limitpCO2 = 1.
@@ -643,7 +580,11 @@ C==== Photosynthesis ===================================================
           alpha_I = alpha_I + alphachl(j,l)*PAR(l)
         ENDDO
 C       NB: for quota, PCmax(j) = Vmax_c(j)
+#ifdef DARWIN_ALLOW_CSTORE
+        PCm = PCmax(j)*photoTempFunc(j)*limitpCO2
+#else
         PCm = PCmax(j)*limitnut*photoTempFunc(j)*limitpCO2
+#endif
 
 C       chl:c for 'balanced growth' at given light
         IF (PCm .GT. 0.0) THEN
@@ -719,13 +660,12 @@ C==== Growth ===========================================================
 C Growth is growth rate of functional internal carbon
 
 #ifdef DARWIN_ALLOW_CSTORE
-C To decide the growth rate according to the minimum of C demand and
-C photosynthesis.  To decide the minimum of C demand by the four
-C elements (N, P, Si, Fe), Dmd_XC is the maximum carbon-specific
-C photosynthesis rate convertible into biomass when X is the limiting
-C nutrient as computed above.
-        growth = MIN(uptakeDIC, Dmd_min)
-        excretC = MAX(0 _d 0, uptakeDIC - growth)*FracExudeC(j)
+C Exudation and storage are decide by the comparison between
+C limitnut and limitI. If limitI is greater than limitnut,
+C exudation and storage happens. Otherwise, storage goes back
+C to functional biomass.
+        growth = MIN(limitI, limitnut) * PCm * X(j)
+        excretC = MAX(0 _d 0, uptakeDIC - growth) * 0.5 _d 0
         excC = excC + excretC
         storeC = uptakeDIC - growth - excretC
 #else /* without CSTORE */
@@ -828,19 +768,9 @@ C factors that go into growth equation
 #ifdef DARWIN_ALLOW_CSTORE
         diags(iEX) = diags(iEX) + excretC
         diags(iGW) = diags(iGW) + growth
-        diags(iDN) = diags(iDN) + Dmd_NC
-        diags(iDP) = diags(iDP) + Dmd_PC
-        diags(iDFe) = diags(iDFe) + Dmd_FeC
-        diags(iDSi) = diags(iDSi) + Dmd_SiC
-        diags(iDmin)= diags(iDmin)+ Dmd_min
 #ifdef DARWIN_ALLOW_CSTORE_DIAGS
         diags(iEXplank+j-1) = diags(iEXplank+j-1) + excretC
         diags(iGWplank+j-1) = diags(iGWplank+j-1) + growth
-        diags(iDNplank+j-1) = diags(iDNplank+j-1) + Dmd_NC
-        diags(iDPplank+j-1) = diags(iDPplank+j-1) + Dmd_PC
-        diags(iDFplank+j-1) = diags(iDFplank+j-1) + Dmd_FeC
-        diags(iDSplank+j-1) = diags(iDSplank+j-1) + Dmd_SiC
-        diags(iDminplank+j-1) = diags(iDminplank+j-1) + Dmd_min
 #endif
 #endif
 

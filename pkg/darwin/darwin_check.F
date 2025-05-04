@@ -2204,9 +2204,6 @@ C--   Print traits from DARWIN_TRAITS.h
       CALL WRITE_1D_RL(ExportFracExude,nplank,INDEX_NONE,
      &'ExportFracExude =',
      &' /* fraction of exudation to POM */')
-      CALL WRITE_1D_RL(FracExudeC,nplank,INDEX_NONE,
-     &'FracExudeC =',
-     &' /* fraction of excess C exuded */')
       CALL WRITE_1D_RL(phytoTempCoeff,nplank,INDEX_NONE,
      &'phytoTempCoeff =',
      &' /* coefficient for DARWIN_TEMP_VERSION 1 */')

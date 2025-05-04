@@ -50,19 +50,9 @@ C Contains indices into diagnostics array
 #ifdef DARWIN_ALLOW_CSTORE
       integer iEX
       integer iGW
-      integer iDN
-      integer iDP
-      integer iDFe
-      integer iDSi
-      integer iDmin
 # ifdef DARWIN_ALLOW_CSTORE_DIAGS
       integer iEXplank
       integer iGWplank
-      integer iDNplank
-      integer iDPplank
-      integer iDFplank
-      integer iDSplank
-      integer iDminplank
 # endif
 #endif
       integer darwin_nDiag
@@ -91,22 +81,12 @@ C Contains indices into diagnostics array
 #ifdef DARWIN_ALLOW_CSTORE
       PARAMETER(iEX=  22)
       PARAMETER(iGW=  iEX+1)
-      PARAMETER(iDN=  iGW+1)
-      PARAMETER(iDP=  iDN+1)
-      PARAMETER(iDFe= iDP+1)
-      PARAMETER(iDSi= iDFe+1)
-      PARAMETER(iDmin=iDSi+1)
 # ifdef DARWIN_ALLOW_CSTORE_DIAGS
-      PARAMETER(iEXplank=iDmin+1)
+      PARAMETER(iEXplank=iGW+1)
       PARAMETER(iGWplank=iEXplank+nPhoto)
-      PARAMETER(iDNplank=iGWplank+nPhoto)
-      PARAMETER(iDPplank=iDNplank+nPhoto)
-      PARAMETER(iDFplank=iDPplank+nPhoto)
-      PARAMETER(iDSplank=iDFplank+nPhoto)
-      PARAMETER(iDminplank=iDSplank+nPhoto)
-      PARAMETER(iPPplank=iDminplank+nPhoto)
+      PARAMETER(iPPplank=iGWplank+nPhoto)
 # else
-      PARAMETER(iPPplank=iDmin+1)
+      PARAMETER(iPPplank=iGW+1)
 # endif
 #else
       PARAMETER(iPPplank=22)
