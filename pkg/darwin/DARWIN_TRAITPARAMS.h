@@ -389,6 +389,10 @@ C
      &    b_respRate_c,
      &    a_kexcC,
      &    b_kexcC,
+     &    a_Qcmax,
+     &    b_Qcmax,
+     &    a_flC,
+     &    b_flC,
      &    a_vmaxNO3,
      &    a_vmaxNO3_denom,
      &    b_vmaxNO3,
@@ -520,6 +524,10 @@ C
       _RL b_respRate_c(nGroup)
       _RL a_kexcC(nGroup)
       _RL b_kexcC(nGroup)
+      _RL a_Qcmax(nGroup)
+      _RL b_Qcmax(nGroup)
+      _RL a_flC(nGroup)
+      _RL b_flC(nGroup)
       _RL a_vmaxNO3(nGroup)
       _RL a_vmaxNO3_denom(nGroup)
       _RL b_vmaxNO3(nGroup)

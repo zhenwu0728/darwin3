@@ -267,6 +267,9 @@ C respRate rate is given in terms of carbon content
 C parameters relating to inorganic nutrients
         PCmax(jp)= a_PCmax(g) * biovol(jp)**b_PCmax(g)
 
+        Qcmax(jp)    = a_Qcmax(g)  * biovol(jp)**b_Qcmax(g)
+        flC(jp)      = a_flC(g)    * biovol(jp)**b_flC(g)
+
         vmaxNH4(jp)  = a_vmaxNH4(g)  * biovol(jp)**b_vmaxNH4(g)
         vmaxNO2(jp)  = a_vmaxNO2(g)  * biovol(jp)**b_vmaxNO2(g)
         vmaxNO3(jp)  = a_vmaxNO3(g)  * biovol(jp)**b_vmaxNO3(g)

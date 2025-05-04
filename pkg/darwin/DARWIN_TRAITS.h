@@ -102,6 +102,8 @@ C
 C     respRate           :: [s^-1]                     respiration rate
 C     PCmax              :: [s^-1]                     maximum carbon-specific growth rate
 C
+C     Qcmax              :: [mmol C (mmol C)^-1]       maximun carbon storage (only with DARWIN_ALLOW_CSTORE)
+C     flC                :: []                         fraction of stored carbon flux (only with DARWIN_ALLOW_CSTORE)
 C     Qnmax              :: [mmol N (mmol C)^-1]       maximum nitrogen quota (only with DARWIN_ALLOW_NQUOTA)
 C     Qnmin              :: [mmol N (mmol C)^-1]       minimum nitrogen quota (only with DARWIN_ALLOW_NQUOTA)
 C     Qpmax              :: [mmol P (mmol C)^-1]       maximum phosphorus quota (only with DARWIN_ALLOW_PQUOTA)
@@ -194,6 +196,8 @@ C     ksatDOFe           :: [mmol Fe m^-3]  half-saturation of DOFe for bacteria
      &    bioswim,
      &    respRate,
      &    PCmax,
+     &    Qcmax,
+     &    flC,
      &    Qnmax,
      &    Qnmin,
      &    Qpmax,
@@ -276,6 +280,8 @@ C     ksatDOFe           :: [mmol Fe m^-3]  half-saturation of DOFe for bacteria
       _RL bioswim(nplank)
       _RL respRate(nplank)
       _RL PCmax(nplank)
+      _RL Qcmax(nplank)
+      _RL flC(nplank)
       _RL Qnmax(nplank)
       _RL Qnmin(nplank)
       _RL Qpmax(nplank)

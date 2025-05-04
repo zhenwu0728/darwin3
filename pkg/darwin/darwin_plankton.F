@@ -9,7 +9,7 @@ C !INTERFACE: ==========================================================
      O     chlout, diags,
      I     PAR, photoTempFunc, hetTempFunc, grazTempFunc, reminTempFunc,
      I     mortTempFunc, mort2TempFunc, uptakeTempFunc,
-     I     omegaCl,
+     I     omegaCl, dTsubk,
      I     k_debug,myTime,myIter,myThid)
 
 C !DESCRIPTION:
@@ -243,6 +243,7 @@ c !LOCAL VARIABLES: ====================================================
       _RL excretC
       _RL excC
       _RL storeC
+      _RL fQc
 #endif
 
 C for grazing
@@ -664,10 +665,31 @@ C Exudation and storage are decide by the comparison between
 C limitnut and limitI. If limitI is greater than limitnut,
 C exudation and storage happens. Otherwise, storage goes back
 C to functional biomass.
-        growth = MIN(limitI, limitnut) * PCm * X(j)
-        excretC = MAX(0 _d 0, uptakeDIC - growth) * 0.5 _d 0
-        excC = excC + excretC
-        storeC = uptakeDIC - growth - excretC
+        IF (limitI .GT. limitnut) THEN
+          growth = PCm * limitnut * X(j) - respir_c
+          fQc = MAX(0.0 _d 0, MIN(1.0 _d 0,
+     &          (1.0 _d 0 - (Qch(j)/Qcmax(j)))))
+          fQc = fQc**4 / (fQc**4 + 1.0 _d -4)
+          storeC = (uptakeDIC - growth) * fQc * flC(j)
+C         Make sure that Cstore is not over filled, maximum (Qcmax-Qc)*X
+C         dTsubk is timestep
+          storeC = MIN(storeC, MAX(0.0 _d 0,
+     &                  (Qcmax(j)-Qch(j))*X(j)/dTsubk))
+          excretC = uptakeDIC - growth - storeC
+          excC = excC + excretC
+        ELSE
+          excretC = 0.0 _d 0
+          excC = excC + excretC 
+          fQc = MAX(0.0 _d 0, MIN(1.0 _d 0,  Qch(j)/Qcmax(j)))
+          fQc = fQc**4 / (fQc**4 + 1.0 _d -4)   
+C         limitnut > limitI
+          growth = PCm * limitnut * X(j) - respir_c ! nutrient limited growth rate
+          storeC = (uptakeDIC - growth) * fQc  * flC(j)! negative value!!!
+C         Make sure that Cstore is not over consumed, maximum Qc*X
+C         dTsubk is timestep
+          storeC = MAX(storeC, -Qch(j)*X(j)/dTsubk)
+          growth = uptakeDIC - storeC
+        ENDIF
 #else /* without CSTORE */
         growth = uptakeDIC
 #endif /* DARWIN_ALLOW_CSTORE */

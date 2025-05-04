@@ -125,6 +125,9 @@ c length of day (seconds)
        vmaxPO4(np) = 0.0 _d 0
        vmaxSiO2(np) = 0.0 _d 0
 
+       Qcmax(np) = 0.0 _d 0
+       flC(np) = 0.0 _d 0
+
 C      initialize discrete traits to "unset"
        physize(np)    = -1
        diacoc(np)     = -1

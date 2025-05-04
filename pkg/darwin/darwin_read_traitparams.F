@@ -209,6 +209,10 @@
      &    b_respRate_c,
      &    a_kexcC,
      &    b_kexcC,
+     &    a_Qcmax,
+     &    b_Qcmax,
+     &    a_flC,
+     &    b_flC,
      &    a_vmaxNO3,
      &    a_vmaxNO3_denom,
      &    b_vmaxNO3,
@@ -488,6 +492,10 @@ C     was 3.21 _d -11 / pday
 C     was 0.32 _d -1 / pday
       a_kexcC = 0.00 _d 0
       b_kexcC = -0.33 _d 0
+      a_Qcmax = 0.3 _d 0
+      b_Qcmax = 0.0 _d 0
+      a_flC = 1.0 _d 0
+      b_flC = 0.0 _d 0
       a_vmaxNO3 = 0.51 _d 0 / pday
       a_vmaxNO3_denom = 1. _d 0
       b_vmaxNO3 = -0.27 _d 0

@@ -76,6 +76,8 @@
      &    bioswim,
      &    respRate,
      &    PCmax,
+     &    Qcmax,
+     &    flC,
      &    Qnmax,
      &    Qnmin,
      &    Qpmax,
