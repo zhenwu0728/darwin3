@@ -674,8 +674,8 @@ C to functional biomass.
           storeC = (uptakeDIC - growth) * fQc * flC(j)
 C         Make sure that Cstore is not over filled, maximum (Qcmax-Qc)*X
 C         dTsubk is timestep
-          storeC = MIN(storeC, MAX(0.0 _d 0,
-     &                  (Qcmax(j)-Qch(j))*X(j)/dTsubk))
+C          storeC = MIN(storeC, MAX(0.0 _d 0,
+C     &                  (Qcmax(j)-Qch(j))*X(j)/dTsubk))
           excretC = uptakeDIC - growth - storeC
           excC = excC + excretC
         ELSE
@@ -688,7 +688,7 @@ C         limitnut > limitI
           storeC = (uptakeDIC - growth) * fQc  * flC(j)! negative value!!!
 C         Make sure that Cstore is not over consumed, maximum Qc*X
 C         dTsubk is timestep
-          storeC = MAX(storeC, -Qch(j)*X(j)/dTsubk)
+C          storeC = MAX(storeC, -Qch(j)*X(j)/dTsubk)
           growth = uptakeDIC - storeC
         ENDIF
 #else /* without CSTORE */
