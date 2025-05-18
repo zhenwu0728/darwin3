@@ -9,7 +9,7 @@ C !INTERFACE: ==========================================================
      O     chlout, diags,
      I     PAR, photoTempFunc, hetTempFunc, grazTempFunc, reminTempFunc,
      I     mortTempFunc, mort2TempFunc, uptakeTempFunc,
-     I     omegaCl,
+     I     omegaCl, dTsubk,
      I     k_debug,myTime,myIter,myThid)
 
 C !DESCRIPTION:
@@ -44,6 +44,7 @@ C  myThid :: thread number
       _RL mort2TempFunc
       _RL omegaCl
       _RL myTime
+      _RL dTsubk
       INTEGER k_debug
       INTEGER myThid, myIter
 
@@ -248,6 +249,7 @@ c !LOCAL VARIABLES: ====================================================
       _RL excretC
       _RL excC
       _RL storeC
+      _RL fQc
 #endif
 
 C for grazing
@@ -724,10 +726,29 @@ C photosynthesis.  To decide the minimum of C demand by the four
 C elements (N, P, Si, Fe), Dmd_XC is the maximum carbon-specific
 C photosynthesis rate convertible into biomass when X is the limiting
 C nutrient as computed above.
-        growth = MIN(uptakeDIC, Dmd_min)
-        excretC = MAX(0 _d 0, uptakeDIC - growth)*FracExudeC(j)
+        IF (uptakeDIC .GT. Dmd_min) THEN
+        growth = Dmd_min
+        fQc = MAX(0.0 _d 0, MIN(1.0 _d 0,
+     &          (1.0 _d 0 - (Qch(j)/Qcmax(j)))))
+        fQc = fQc**4 / (fQc**4 + 1.0 _d -4)
+        storeC = (uptakeDIC - Dmd_min) * fQc * flC(j)
+C         Make sure that Cstore is not over filled, maximum (Qcmax-Qc)*X
+C         dTsubk is timestep
+        storeC = MIN(storeC, MAX(0.0 _d 0,
+     &                  (Qcmax(j)-Qch(j))*X(j)/dTsubk))
+        excretC = uptakeDIC - growth - storeC
         excC = excC + excretC
-        storeC = uptakeDIC - growth - excretC
+      ELSE
+        excretC = 0.0 _d 0
+        excC = excC + excretC
+        fQc = MAX(0.0 _d 0, MIN(1.0 _d 0,  Qch(j)/Qcmax(j)))
+        fQc = fQc**4 / (fQc**4 + 1.0 _d -4)
+C         Dmd_min > uptakeDIC
+        storeC = (uptakeDIC - Dmd_min) * fQc  * flC(j)! negative value!!!
+C         Make sure that Cstore is not over used, maximum Qch*X
+        storeC = MAX(storeC, -Qch(j)*X(j)/dTsubk)
+        growth = uptakeDIC - storeC
+      ENDIF 
 #else /* without CSTORE */
         growth = uptakeDIC
 #endif /* DARWIN_ALLOW_CSTORE */

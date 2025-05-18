@@ -335,7 +335,6 @@ C
      &    a_ExportFracMort,
      &    a_ExportFracMort2,
      &    a_ExportFracExude,
-     &    a_FracExudeC,
      &    a_mort,
      &    a_mort2,
      &    a_phytoTempCoeff,
@@ -395,10 +394,14 @@ C
      &    b_vmaxNO3,
      &    a_ksatNO3,
      &    b_ksatNO3,
+     &    a_Qcmax,
+     &    b_Qcmax,
      &    a_Qnmin,
      &    b_Qnmin,
      &    a_Qnmax,
      &    b_Qnmax,
+     &    a_flC,
+     &    b_flC,
      &    a_kexcN,
      &    b_kexcN,
      &    a_vmaxNO2,
@@ -467,7 +470,6 @@ C
       _RL a_ExportFracMort(nGroup)
       _RL a_ExportFracMort2(nGroup)
       _RL a_ExportFracExude(nGroup)
-      _RL a_FracExudeC(nGroup)
       _RL a_mort(nGroup)
       _RL a_mort2(nGroup)
       _RL a_phytoTempCoeff(nGroup)
@@ -527,10 +529,14 @@ C
       _RL b_vmaxNO3(nGroup)
       _RL a_ksatNO3(nGroup)
       _RL b_ksatNO3(nGroup)
+      _RL a_Qcmax(nGroup)
+      _RL b_Qcmax(nGroup)
       _RL a_Qnmin(nGroup)
       _RL b_Qnmin(nGroup)
       _RL a_Qnmax(nGroup)
       _RL b_Qnmax(nGroup)
+      _RL a_flC(nGroup)
+      _RL b_flC(nGroup)
       _RL a_kexcN(nGroup)
       _RL b_kexcN(nGroup)
       _RL a_vmaxNO2(nGroup)

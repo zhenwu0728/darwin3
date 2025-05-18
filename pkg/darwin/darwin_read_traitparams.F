@@ -155,7 +155,6 @@
      &    a_ExportFracMort,
      &    a_ExportFracMort2,
      &    a_ExportFracExude,
-     &    a_FracExudeC,
      &    a_mort,
      &    a_mort2,
      &    a_phytoTempCoeff,
@@ -215,10 +214,14 @@
      &    b_vmaxNO3,
      &    a_ksatNO3,
      &    b_ksatNO3,
+     &    a_Qcmax,
+     &    b_Qcmax,
      &    a_Qnmin,
      &    b_Qnmin,
      &    a_Qnmax,
      &    b_Qnmax,
+     &    a_flC,
+     &    b_flC,
      &    a_kexcN,
      &    b_kexcN,
      &    a_vmaxNO2,
@@ -432,7 +435,6 @@ C     used to be 120D-20 for phyto
       a_ExportFracMort = 0.5 _d 0
       a_ExportFracMort2 = 0.5 _d 0
       a_ExportFracExude = DARWIN_UNINIT_RL
-      a_FracExudeC = 0.3 _d 0
       a_mort = 0.02 _d 0 / pday
       a_mort2 = 0.0 _d 0
       a_phytoTempCoeff = 1. _d 0/3. _d 0
@@ -495,11 +497,15 @@ C     was 0.32 _d -1 / pday
       b_vmaxNO3 = -0.27 _d 0
       a_ksatNO3 = 0.17 _d 0
       b_ksatNO3 = 0.27 _d 0
+      a_Qcmax = 0.3 _d 0
+      b_Qcmax = 0.0 _d 0
       a_Qnmin = 0.07 _d 0
       b_Qnmin = -0.17 _d 0
       a_Qnmax = 0.25 _d 0
       b_Qnmax = -0.13 _d 0
 C     was 0.24 _d -1 / pday
+      a_flC = 1.0 _d 0
+      b_flC = 0.0 _d 0
       a_kexcN = 0.00 _d 0
       b_kexcN = -0.33 _d 0
       a_vmaxNO2 = 0.51 _d 0 / pday

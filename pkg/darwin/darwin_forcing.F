@@ -651,7 +651,7 @@ C-      default (face fit into global-IO-array)
      I                 reminTempFunc,
      I                 mortTempFunc, mort2TempFunc,
      I                 uptakeTempFunc,
-     I                 omegaCl,
+     I                 omegaCl, dTsub(k),
      I                 k_debug,
      I                 subTime, myIter, myThid )
         DO l=1,darwin_nDiag

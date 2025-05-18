@@ -72,7 +72,6 @@ C     mort2              :: [(mmol C m^-3)^-1 s^-1]    quadratic mortality coeff
 C     ExportFracMort     :: []                         fraction of linear mortality to POM
 C     ExportFracMort2    :: []                         fraction of quadratic mortality to POM
 C     ExportFracExude    :: []                         fraction of exudation to POM
-C     FracExudeC         :: []                         fraction of excess C exuded
 C
 C- temperature dependence:
 C     phytoTempCoeff     :: []                         see :numref:`pkg_darwin_temperature_params`
@@ -103,6 +102,8 @@ C
 C     respRate           :: [s^-1]                     respiration rate
 C     PCmax              :: [s^-1]                     maximum carbon-specific growth rate
 C
+C     Qcmax              :: [mmol C (mmol C)^-1]       maximun carbon storage (only with DARWIN_ALLOW_CSTORE)
+C     flC                :: []                         fraction of stored carbon flux (only with DARWIN_ALLOW_CSTORE)
 C     Qnmax              :: [mmol N (mmol C)^-1]       maximum nitrogen quota (only with DARWIN_ALLOW_NQUOTA)
 C     Qnmin              :: [mmol N (mmol C)^-1]       minimum nitrogen quota (only with DARWIN_ALLOW_NQUOTA)
 C     Qpmax              :: [mmol P (mmol C)^-1]       maximum phosphorus quota (only with DARWIN_ALLOW_PQUOTA)
@@ -171,7 +172,6 @@ C     ksatDOFe           :: [mmol Fe m^-3]  half-saturation of DOFe for bacteria
      &    ExportFracMort,
      &    ExportFracMort2,
      &    ExportFracExude,
-     &    FracExudeC,
      &    phytoTempCoeff,
      &    phytoTempExp1,
      &    phytoTempAe,
@@ -196,6 +196,7 @@ C     ksatDOFe           :: [mmol Fe m^-3]  half-saturation of DOFe for bacteria
      &    bioswim,
      &    respRate,
      &    PCmax,
+     &    Qcmax,
      &    Qnmax,
      &    Qnmin,
      &    Qpmax,
@@ -204,6 +205,7 @@ C     ksatDOFe           :: [mmol Fe m^-3]  half-saturation of DOFe for bacteria
      &    Qsimin,
      &    Qfemax,
      &    Qfemin,
+     &    flC,
      &    VmaxNH4,
      &    VmaxNO2,
      &    VmaxNO3,
@@ -254,7 +256,6 @@ C     ksatDOFe           :: [mmol Fe m^-3]  half-saturation of DOFe for bacteria
       _RL ExportFracMort(nplank)
       _RL ExportFracMort2(nplank)
       _RL ExportFracExude(nplank)
-      _RL FracExudeC(nplank)
       _RL phytoTempCoeff(nplank)
       _RL phytoTempExp1(nplank)
       _RL phytoTempAe(nplank)
@@ -279,6 +280,7 @@ C     ksatDOFe           :: [mmol Fe m^-3]  half-saturation of DOFe for bacteria
       _RL bioswim(nplank)
       _RL respRate(nplank)
       _RL PCmax(nplank)
+      _RL Qcmax(nplank)
       _RL Qnmax(nplank)
       _RL Qnmin(nplank)
       _RL Qpmax(nplank)
@@ -287,6 +289,7 @@ C     ksatDOFe           :: [mmol Fe m^-3]  half-saturation of DOFe for bacteria
       _RL Qsimin(nplank)
       _RL Qfemax(nplank)
       _RL Qfemin(nplank)
+      _RL flC(nplank)
       _RL VmaxNH4(nplank)
       _RL VmaxNO2(nplank)
       _RL VmaxNO3(nplank)

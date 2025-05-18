@@ -227,7 +227,6 @@ C       if 0, temperature dependent, if 1, not.
         ExportFracMort(jp) = a_ExportFracMort(g)
         ExportFracMort2(jp) = a_ExportFracMort2(g)
         ExportFracExude(jp) = a_ExportFracExude(g)
-        FracExudeC(jp) = a_FracExudeC(g)
 
 C temperature function parameters
         phytoTempCoeff(jp)   = a_phytoTempCoeff(g)
@@ -275,6 +274,9 @@ C parameters relating to inorganic nutrients
         vmaxPO4(jp)  = a_vmaxPO4(g)  * biovol(jp)**b_vmaxPO4(g)
         vmaxSiO2(jp) = a_vmaxSiO2(g) * biovol(jp)**b_vmaxSiO2(g)
         vmaxFeT(jp)  = a_vmaxFeT(g)  * biovol(jp)**b_vmaxFeT(g)
+
+        Qcmax(jp)    = a_Qcmax(g)  * biovol(jp)**b_Qcmax(g)
+        flC(jp)      = a_flC(g)    * biovol(jp)**b_flC(g)
 
         Qnmin(jp)    = a_Qnmin(g)  * biovol(jp)**b_Qnmin(g)
         Qnmax(jp)    = a_Qnmax(g)  * biovol(jp)**b_Qnmax(g)
