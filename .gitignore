@@ -21,7 +21,7 @@ core
 *.pyc
 # OSX system files
 .DS_store
-
+.vscode/
 /doc/_build/
 
 /eesupp/src/exch_xy_r[ls48].F
