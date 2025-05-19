@@ -108,6 +108,7 @@ c length of day (seconds)
        kexcsi(np) = 0.0 _d 0
        kexcfe(np) = 0.0 _d 0
 
+       Qcmax(np) = 0.3 _d 0
        Qnmax(np) = 0.0 _d 0
        Qnmin(np) = 0.0 _d 0
        Qpmax(np) = 0.0 _d 0
@@ -116,6 +117,7 @@ c length of day (seconds)
        Qsimin(np) = 0.0 _d 0
        Qfemax(np) = 0.0 _d 0
        Qfemin(np) = 0.0 _d 0
+       flC(np)    = 0.0 _d 0
 
        vmaxFeT(np) = 0.0 _d 0
        vmaxNH4(np) = 0.0 _d 0
@@ -521,7 +523,6 @@ c big/small phyto mortality rates..
         ExportFracExude(np)=DARWIN_UNINIT_RL
 #endif
       ENDIF
-      FracExudeC(np) = 0.3 _d 0
 #ifdef DARWIN_TWO_SPECIES_SETUP
       IF(physize(np) .EQ. 1)then
         mortdays = Bigmort
@@ -944,8 +945,6 @@ c assume zoo(1) = small, zoo(2) = big
        ExportFracExude(iMinPred) = DARWIN_UNINIT_RL
        ExportFracExude(iMaxPred) = DARWIN_UNINIT_RL
 #endif
-       FracExudeC(iMinPred) = 0.3 _d 0
-       FracExudeC(iMaxPred) = 0.3 _d 0
        mort(iMinPred) = ZoomortSmall
        mort(iMaxPred) = ZoomortBig
        mort2(iMinPred) = ZoomortSmall2
@@ -999,7 +998,6 @@ c     not oldTwoGrazers
 #else
         ExportFracExude(nz) = DARWIN_UNINIT_RL
 #endif
-        FracExudeC(nz) = 0.3 _d 0
         mort(nz) = Zoomort
         mort2(nz) = Zoomort2
         dmzoo(nz) = ZooDM
