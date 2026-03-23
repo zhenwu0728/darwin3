@@ -68,6 +68,8 @@ C       |   |- ECCO_COST_INIT_FIXED
 C       |
 C       |-- PROFILES_INIT_FIXED
 C       |
+C       |-- OBSFIT_INIT_FIXED
+C       |
 C       |-- FLT_INIT_FIXED
 C       |
 C       |-- OASIM_INIT_FIXED
@@ -109,8 +111,6 @@ C       |
 C       |-- FIZHI_INIT_FIXED
 C       |
 C       |-- GRIDALT_INITIALISE
-C       |
-C       |-- TIMEAVE_INIT_FIXED
 C       |
 C       |-- REGRID_INIT_FIXED
 C       |
@@ -387,6 +387,15 @@ C--   provide the weight files.
       ENDIF
 #endif
 
+#ifdef ALLOW_OBSFIT
+      IF (useOBSFIT) THEN
+# ifdef ALLOW_DEBUG
+        IF (debugMode) CALL DEBUG_CALL('OBSFIT_INIT_FIXED',myThid)
+# endif
+        CALL OBSFIT_INIT_FIXED( myThid )
+      ENDIF
+#endif
+
 C--   Old place where CTRL_INIT_FIXED & CTRL_ADMTLM used to be called
 
 #ifdef ALLOW_FLT
@@ -594,16 +603,6 @@ C--   Initialise GRIDALT parameters - the alternative grid
         IF (debugMode) CALL DEBUG_CALL('GRIDALT_INITIALISE',myThid)
 # endif
         CALL GRIDALT_INITIALISE( myThid )
-      ENDIF
-#endif
-
-#ifdef ALLOW_TIMEAVE
-C     IF (useTIMEAVE) THEN
-      IF ( taveFreq.GT.0. ) THEN
-# ifdef ALLOW_DEBUG
-        IF (debugMode) CALL DEBUG_CALL('TIMEAVE_INIT_FIXED',myThid)
-# endif
-        CALL TIMEAVE_INIT_FIXED( myThid )
       ENDIF
 #endif
 

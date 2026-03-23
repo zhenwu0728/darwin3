@@ -5,6 +5,8 @@
 #include "SIZE.h"
 #include "EEPARAMS.h"
 #include "PARAMS.h"
+#include "PTRACERS_SIZE.h"
+#include "PTRACERS_PARAMS.h"
 #ifdef ALLOW_RADTRANS
 #include "RADTRANS_SIZE.h"
 #endif
@@ -97,6 +99,7 @@ C----
      &    TempAeArr,
      &    TemprefArr,
      &    TempCoeffArr,
+     &    TempAeArrMacromol,
      &    reminTempAe,
      &    mortTempAe,
      &    mort2TempAe,
@@ -141,6 +144,7 @@ C----
      &    KPON,
      &    KPOFe,
      &    KPOSi,
+     &    ksatO2remin,
      &    wC_sink,
      &    wP_sink,
      &    wN_sink,
@@ -228,7 +232,6 @@ C----
      &    synthcost,
      &    inhib_graz,
      &    inhib_graz_exp,
-     &    hillnumUptake,
      &    hillnumGraz,
      &    hollexp,
      &    phygrazmin,
@@ -441,7 +444,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
       darwin_linFSConserve = .FALSE.
       darwin_read_phos = .FALSE.
       darwin_chlInitBalanced = .FALSE.
-      darwin_chlIter0 = 0
+      darwin_chlIter0 = UNSET_I
       katten_w = 4. _d -2
       katten_chl = 4. _d -2
       parfrac = 0.4 _d 0
@@ -450,6 +453,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
       TempAeArr = -4000.0 _d 0
       TemprefArr = 293.15 _d 0
       TempCoeffArr = 0.5882 _d 0
+      TempAeArrMacromol = -8420.0 _d 0
       reminTempAe = 0.0438 _d 0
       mortTempAe = 0.0438 _d 0
       mort2TempAe = 0.0438 _d 0
@@ -496,6 +500,7 @@ C
       KPON = KPOC
       KPOFe = KPOC
       KPOSi = 1 _d 0/(300 _d 0*pday)
+      ksatO2remin = 0 _d 0
       wC_sink = 10 _d 0/pday
       wP_sink = wC_sink
       wN_sink = wC_sink
@@ -552,7 +557,6 @@ C     O2crit from Lipschultz et al 1990, DSR 37, 1513-1541:
       synthcost = 0.0 _d 0
       inhib_graz = 1.0 _d 0
       inhib_graz_exp = 0.0 _d 0
-      hillnumUptake = 1.0 _d 0
       hillnumGraz = 1.0 _d 0
       hollexp = 1.0 _d 0
       phygrazmin = 120 _d -10
@@ -671,6 +675,8 @@ C-    set parameter default values
       IF ( selectK1K2const.EQ.UNSET_I ) selectK1K2const = 1
       IF ( selectPHsolver .EQ.UNSET_I ) selectPHsolver  = 0
 #endif
+
+      IF ( darwin_chlIter0.EQ.UNSET_I ) darwin_chlIter0 = PTRACERS_Iter0
 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7-|--+----|
 C--   Print out parameter values :

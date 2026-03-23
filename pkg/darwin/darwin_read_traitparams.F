@@ -172,6 +172,36 @@
      &    a_grazTempExp2,
      &    a_grazTempOptimum,
      &    a_grazDecayPower,
+#ifdef DARWIN_MACROMOLECULAR_GROWTH
+     &    a_Y_CP_Plip,
+     &    a_Y_CN_protein,
+     &    a_Y_NC_chl,
+     &    a_Y_CN_cyano,
+     &    a_Y_PN_nucacid,
+     &    a_Y_CN_DNA,
+     &    a_Y_CN_RNA,
+     &    a_Y_THY_P,
+     &    a_Y_FeN_photo,
+     &    a_ECo2Prod,
+     &    a_maintConsum,
+     &    a_VI_max,
+     &    b_VI_max,
+     &    a_A_I,
+     &    a_QC_other,
+     &    a_QC_pro_other,
+     &    a_QP_other,
+     &    a_QP_RNA_min,
+     &    a_QC_DNA,
+     &    a_QN_sto_max,
+     &    b_QN_sto_max,
+     &    a_Qp_max,
+     &    b_Qp_max,
+     &    a_Qfe_max,
+     &    b_Qfe_max,
+     &    a_A_pho,
+     &    a_A_bio,
+     &    a_AP_RNA,
+#endif
 #ifdef DARWIN_ALLOW_GEIDER
      &    a_mQyield,
      &    a_chl2cmax,
@@ -185,6 +215,10 @@
      &    a_acclimtimescl_denom,
      &    a_ksatPON,
      &    a_ksatDON,
+     &    a_hillnumDIN,
+     &    a_hillnumPO4,
+     &    a_hillnumFeT,
+     &    a_hillnumSiO2,
      &    a_grazemax,
      &    a_grazemax_denom,
      &    b_grazemax,
@@ -196,6 +230,8 @@
      &    a_bioswim,
      &    a_bioswim_denom,
      &    b_bioswim,
+     &    a_bioswimDVM,
+     &    b_bioswimDVM,
      &    a_ppSig,
      &    a_ppOpt,
      &    b_ppOpt,
@@ -270,7 +306,18 @@
      &    a_kexcFe,
      &    b_kexcFe,
      &    grp_ExportFracPreyPred,
-     &    grp_ass_eff
+     &    grp_ass_eff,
+     &    a_PARpref,
+     &    b_PARpref,
+     &    a_mortmaxDVM,
+     &    b_mortmaxDVM,
+     &    a_ksatDVM,
+     &    b_ksatDVM,
+     &    a_ksatPARDVM,
+     &    b_ksatPARDVM,
+     &    a_fracPARmort,
+     &    b_fracPARmort,
+     &    a_ExportFracDVM
 
 
 
@@ -449,6 +496,36 @@ C     used to be 120D-20 for phyto
       a_grazTempExp2 = 0.001 _d 0
       a_grazTempOptimum = 2. _d 0
       a_grazDecayPower = 4. _d 0
+#ifdef DARWIN_MACROMOLECULAR_GROWTH
+      a_A_pho = 16.0 _d 0
+      a_Y_THY_P = 0.028163 _d 0
+      a_Y_CN_protein = 5.3 _d 0 /1.4 _d 0
+      a_Y_FeN_photo = 0.00163 _d 0
+      a_Y_NC_chl = 4.0 _d 0/55.0 _d 0
+      a_Y_CN_cyano = 2.0 _d 0
+      a_Y_PN_nucacid = 1. _d 0 /3.75 _d 0
+      a_Y_CN_DNA = 9.75 _d 0 /3.75 _d 0
+      a_Y_CN_RNA = 9.50 _d 0 /3.75 _d 0
+      a_Y_CP_Plip = 40.0 _d 0
+      a_ECo2Prod = 0.774 _d 0
+      a_maintConsum = 0.393 _d 0/3600/24
+      a_VI_max = 277 _d 0/3600/24
+      b_VI_max = 0 _d 0
+      a_A_I = 0.008633641 _d 0
+      a_QC_other = 0.0182 _d 0
+      a_QC_pro_other = 0.24 _d 0
+      a_QP_other = 6.5344 _d -4
+      a_QP_RNA_min = 2.23 _d -4
+      a_QC_DNA = 9.41 _d -4
+      a_QN_sto_max = 0.035 _d 0
+      b_QN_sto_max = 0 _d 0
+      a_Qp_max = 0.0052 _d 0
+      b_Qp_max = 0 _d 0
+      a_Qfe_max = 2.436 _d -4
+      b_Qfe_max = 0 _d 0
+      a_A_bio = 0.2711 _d 0*3600*24
+      a_AP_RNA = 0.00423 _d 0*3600*24
+#endif
 #ifdef DARWIN_ALLOW_GEIDER
       a_mQyield = 75 _d -6
       a_chl2cmax = .3 _d 0
@@ -462,6 +539,10 @@ C     used to be 120D-20 for phyto
       a_acclimtimescl_denom = 1 _d 0
       a_ksatPON = 1 _d 0
       a_ksatDON = 1 _d 0
+      a_hillnumDIN = 1 _d 0
+      a_hillnumPO4 = 1 _d 0
+      a_hillnumFeT = 1 _d 0
+      a_hillnumSiO2 = 1 _d 0
       a_grazemax = 21.9 _d 0 / pday
       a_grazemax_denom = 1. _d 0
       b_grazemax = -0.16 _d 0
@@ -474,6 +555,8 @@ C     used to be 22.4
       a_bioswim = 0.00 _d 0 / pday
       a_bioswim_denom = 1. _d 0
       b_bioswim = 0.18 _d 0
+      a_bioswimDVM = 0.0 _d 0  ! value for DVM groups: 3.0 _d -2 [Bianchi et al. 2013]
+      b_bioswimDVM = 0.0 _d 0  ! Not sure if should be size dependent
       a_ppSig = 1.0 _d 0
       a_ppOpt = 1024. _d 0
       b_ppOpt = 0.00 _d 0
@@ -560,6 +643,19 @@ C     [Mongin 2006]
       b_kexcFe = 0.00 _d 0
       grp_ExportFracPreyPred = 0.5 _d 0
       grp_ass_eff = 0.7 _d 0
+      a_PARpref = 0.0046 _d 0  ! [uE/m2/s=~10^-3 W/m2, Bianchi_etal.2013]
+      b_PARpref = 0.00 _d 0
+      a_mortmaxDVM = 8.389 _d -5  ! ImaxHP from Bianchi et al, from Hansen et al
+C     mortmaxDVM is for higher pred eating prey, so extrapolate to predator
+C     but base on prey volume, so assumed 10:1 predator:prey radius ratio
+      b_mortmaxDVM = -0.16 _d 0   ! same as b_grazemax, same as Hansen
+      a_ksatDVM = 1.0 _d 0/a_R_NC ! K_Z from Bianchi et al., from Stock and Dunne
+      b_ksatDVM = 0.0 _d 0        ! assume not size dependent
+      a_ksatPARDVM = 0.46 _d 0    ! K_irr in Bianchi etal 2013
+      b_ksatPARDVM = 0.0 _d 0     ! assume no size dependence
+      a_fracPARmort = 0.9 _d 0    ! from Bianchi et al.
+      b_fracPARmort = 0.0 _d 0    ! assume no size dependence
+      a_ExportFracDVM = 0.5 _d 0  ! no size dependence
 
       READ(UNIT=iUnit, NML=DARWIN_TRAIT_PARAMS)
 

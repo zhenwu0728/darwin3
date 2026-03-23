@@ -352,6 +352,36 @@ C
      &    a_grazTempExp2,
      &    a_grazTempOptimum,
      &    a_grazDecayPower,
+#ifdef DARWIN_MACROMOLECULAR_GROWTH
+     &    a_Y_CP_Plip,
+     &    a_Y_CN_protein,
+     &    a_Y_NC_chl,
+     &    a_Y_CN_cyano,
+     &    a_Y_PN_nucacid,
+     &    a_Y_CN_DNA,
+     &    a_Y_CN_RNA,
+     &    a_Y_THY_P,
+     &    a_Y_FeN_photo,
+     &    a_ECo2Prod,
+     &    a_maintConsum,
+     &    a_VI_max,
+     &    b_VI_max,
+     &    a_A_I,
+     &    a_QC_other,
+     &    a_QC_pro_other,
+     &    a_QP_other,
+     &    a_QP_RNA_min,
+     &    a_QC_DNA,
+     &    a_QN_sto_max,
+     &    b_QN_sto_max,
+     &    a_Qp_max,
+     &    b_Qp_max,
+     &    a_Qfe_max,
+     &    b_Qfe_max,
+     &    a_A_pho,
+     &    a_A_bio,
+     &    a_AP_RNA,
+#endif
 #ifdef DARWIN_ALLOW_GEIDER
      &    a_mQyield,
      &    a_chl2cmax,
@@ -365,6 +395,10 @@ C
      &    a_acclimtimescl_denom,
      &    a_ksatPON,
      &    a_ksatDON,
+     &    a_hillnumDIN,
+     &    a_hillnumPO4,
+     &    a_hillnumFeT,
+     &    a_hillnumSiO2,
      &    a_grazemax,
      &    a_grazemax_denom,
      &    b_grazemax,
@@ -376,6 +410,8 @@ C
      &    a_bioswim,
      &    a_bioswim_denom,
      &    b_bioswim,
+     &    a_bioswimDVM,
+     &    b_bioswimDVM,
      &    a_ppSig,
      &    a_ppOpt,
      &    b_ppOpt,
@@ -450,7 +486,18 @@ C
      &    a_kexcFe,
      &    b_kexcFe,
      &    grp_ExportFracPreyPred,
-     &    grp_ass_eff
+     &    grp_ass_eff,
+     &    a_PARpref,
+     &    b_PARpref,
+     &    a_mortmaxDVM,
+     &    b_mortmaxDVM,
+     &    a_ksatDVM,
+     &    b_ksatDVM,
+     &    a_ksatPARDVM,
+     &    b_ksatPARDVM,
+     &    a_fracPARmort,
+     &    b_fracPARmort,
+     &    a_ExportFracDVM
       _RL logvolbase
       _RL logvolinc
       _RL biovol0(nGroup)
@@ -484,6 +531,36 @@ C
       _RL a_grazTempExp2(nGroup)
       _RL a_grazTempOptimum(nGroup)
       _RL a_grazDecayPower(nGroup)
+#ifdef DARWIN_MACROMOLECULAR_GROWTH
+      _RL a_Y_CP_Plip(nGroup)
+      _RL a_Y_CN_protein(nGroup)
+      _RL a_Y_NC_chl(nGroup)
+      _RL a_Y_CN_cyano(nGroup)
+      _RL a_Y_PN_nucacid(nGroup)
+      _RL a_Y_CN_DNA(nGroup)
+      _RL a_Y_CN_RNA(nGroup)
+      _RL a_Y_THY_P(nGroup)
+      _RL a_Y_FeN_photo(nGroup)
+      _RL a_ECo2Prod(nGroup)
+      _RL a_maintConsum(nGroup)
+      _RL a_VI_max(nGroup)
+      _RL b_VI_max(nGroup)
+      _RL a_A_I(nGroup)
+      _RL a_QC_other(nGroup)
+      _RL a_QC_pro_other(nGroup)
+      _RL a_QP_other(nGroup)
+      _RL a_QP_RNA_min(nGroup)
+      _RL a_QC_DNA(nGroup)
+      _RL a_QN_sto_max(nGroup)
+      _RL b_QN_sto_max(nGroup)
+      _RL a_Qp_max(nGroup)
+      _RL b_Qp_max(nGroup)
+      _RL a_Qfe_max(nGroup)
+      _RL b_Qfe_max(nGroup)
+      _RL a_A_pho(nGroup)
+      _RL a_A_bio(nGroup)
+      _RL a_AP_RNA(nGroup)
+#endif
 #ifdef DARWIN_ALLOW_GEIDER
       _RL a_mQyield(nGroup)
       _RL a_chl2cmax(nGroup)
@@ -497,6 +574,10 @@ C
       _RL a_acclimtimescl_denom(nGroup)
       _RL a_ksatPON(nGroup)
       _RL a_ksatDON(nGroup)
+      _RL a_hillnumDIN(nGroup)
+      _RL a_hillnumPO4(nGroup)
+      _RL a_hillnumFeT(nGroup)
+      _RL a_hillnumSiO2(nGroup)
       _RL a_grazemax(nGroup)
       _RL a_grazemax_denom(nGroup)
       _RL b_grazemax(nGroup)
@@ -508,6 +589,8 @@ C
       _RL a_bioswim(nGroup)
       _RL a_bioswim_denom(nGroup)
       _RL b_bioswim(nGroup)
+      _RL a_bioswimDVM(nGroup)
+      _RL b_bioswimDVM(nGroup)
       _RL a_ppSig(nGroup)
       _RL a_ppOpt(nGroup)
       _RL b_ppOpt(nGroup)
@@ -583,6 +666,17 @@ C
       _RL b_kexcFe(nGroup)
       _RL grp_ExportFracPreyPred(nGroup,nGroup)
       _RL grp_ass_eff(nGroup,nGroup)
+      _RL a_PARpref(nGroup)
+      _RL b_PARpref(nGroup)
+      _RL a_mortmaxDVM(nGroup)
+      _RL b_mortmaxDVM(nGroup)
+      _RL a_ksatDVM(nGroup)
+      _RL b_ksatDVM(nGroup)
+      _RL a_ksatPARDVM(nGroup)
+      _RL b_ksatPARDVM(nGroup)
+      _RL a_fracPARmort(nGroup)
+      _RL b_fracPARmort(nGroup)
+      _RL a_ExportFracDVM(nGroup)
 
 #endif /* ALLOW_DARWIN */
 

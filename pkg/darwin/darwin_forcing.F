@@ -143,6 +143,13 @@ C     Dependent variables for sediment flux for validation
       _RL ptr(nDarwin), gtr(nDarwin), PARl(nlam)
       _RL chlout(nPhoto)
       _RL diagsl(darwin_nDiag)
+      _RL sumpreyl(nplank)
+      _RL sumprey(1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr,nplank)
+      _RL bioswimDVMup(1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr,nplank)
+      _RL bioswimDVMdn(1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr,nplank)
+      _RL SwDr(1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr,nplank)
+      INTEGER max_loc(1-OLx:sNx+OLx,1-OLy:sNy+OLy,nplank)
+      _RL sumPAR(1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr)
       _RL photoTempFunc(nplank)
       _RL hetTempFunc(nplank)
       _RL grazTempFunc(nplank)
@@ -150,6 +157,7 @@ C     Dependent variables for sediment flux for validation
       _RL mortTempFunc
       _RL mort2TempFunc
       _RL uptakeTempFunc
+      _RL macromolTempFunc
       _RL omegaCl
       _RL tmp, tmpFac
       _RL sedFe(1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr)
@@ -340,6 +348,24 @@ C === nutrient runoff ==================================================
      I                          myIter, myTime, myThid )
 
       CALL DARWIN_ADD_SURFFORC(
+     U                          gPtr(1-OLx,1-OLy,1,iNO3),
+     I                          NO3runoff(1-OLx,1-OLy,bi,bj), 1 _d 0,
+     I                          bi, bj, iMin, iMax, jMin, jMax,
+     I                          myIter, myTime, myThid )
+
+      CALL DARWIN_ADD_SURFFORC(
+     U                          gPtr(1-OLx,1-OLy,1,iNO2),
+     I                          NO2runoff(1-OLx,1-OLy,bi,bj), 1 _d 0,
+     I                          bi, bj, iMin, iMax, jMin, jMax,
+     I                          myIter, myTime, myThid )
+
+      CALL DARWIN_ADD_SURFFORC(
+     U                          gPtr(1-OLx,1-OLy,1,iNH4),
+     I                          NH4runoff(1-OLx,1-OLy,bi,bj), 1 _d 0,
+     I                          bi, bj, iMin, iMax, jMin, jMax,
+     I                          myIter, myTime, myThid )
+
+      CALL DARWIN_ADD_SURFFORC(
      U                          gPtr(1-OLx,1-OLy,1,iPO4),
      I                          IPrunoff(1-OLx,1-OLy,bi,bj),
      I                          R_DIP_IP_runoff,
@@ -490,7 +516,7 @@ C     iron sediment source (in bottom grid cell above kMaxFeSed)
         IF (k .GE. kMinFeSed .AND. k .LE. kMaxFeSed) THEN
 #ifdef DARWIN_IRON_SED_SOURCE_VARIABLE
 # ifdef DARWIN_IRON_SED_SOURCE_POP
-C         mask is needed to make sure k-1 isn't an ice shelf
+C         mask is needed to make sure k-1 is not an ice shelf
           flx = fesedflux_pcm*wp_sink*R_CP_fesed*
      &            MAX(0 _d 0, Ptracer(i,j,k-1,bi,bj,iPOP))
      &            *maskC(i,j,k-1,bi,bj)
@@ -628,7 +654,7 @@ C-      default (face fit into global-IO-array)
         CALL DARWIN_TEMPFUNC(Theta(i,j,k,bi,bj),
      &         photoTempFunc, hetTempFunc, grazTempFunc,
      &         reminTempFunc, mortTempFunc, mort2TempFunc,
-     &         uptakeTempFunc, myThid)
+     &         uptakeTempFunc, macromolTempFunc, myThid)
         DO iTr=1,nDarwin
          ptr(iTr) = Ptracer(i, j, k, bi, bj, iTr)
          gtr(iTr) = gPtr(i, j, k, iTr)
@@ -644,19 +670,22 @@ C-      default (face fit into global-IO-array)
         CALL DARWIN_PLANKTON(
      I                 ptr,
      U                 gtr,
-     O                 chlout, diagsl,
+     O                 chlout, diagsl, sumpreyl,
      I                 PARl, photoTempFunc,
      I                 hetTempFunc,
      I                 grazTempFunc,
      I                 reminTempFunc,
      I                 mortTempFunc, mort2TempFunc,
-     I                 uptakeTempFunc,
+     I                 uptakeTempFunc, macromolTempFunc,
      I                 omegaCl,
      I                 k_debug,
      I                 subTime, myIter, myThid )
         DO l=1,darwin_nDiag
          diags(i, j, k, l) = diagsl(l)
         ENDDO
+
+        sumprey(i,j,k,:) = sumpreyl
+
 #ifdef DARWIN_ALLOW_CONS
         DARWIN_Nfix(i,j,k,bi,bj)   = DARWIN_Nfix(i,j,k,bi,bj)
      &                             + dTsub(k)*diagsl(iNfix)
@@ -689,7 +718,109 @@ C-      default (face fit into global-IO-array)
        enddo
       enddo
       enddo
+
       CALL TIMER_STOP('DARWIN_PLANKTON [DARWIN_FORCING]',myThid)
+
+C === DVM ==============================================================
+
+      CALL TIMER_START('DARWIN_DVM [DARWIN_FORCING]',myThid)
+
+#ifdef DARWIN_ALLOW_DVM
+C Find DVM swim direction to go to max food availablity
+      max_loc = MAXLOC(sumprey, DIM=3)
+      DO iTr=1,nplank
+       DO k=1,Nr
+        DO j=jMin,jMax
+         DO i=iMin,iMax
+          IF (k.LT.max_loc(i,j,iTr)) THEN
+           SwDr(i,j,k,iTr) = -1 _d 0
+          ELSEIF (k.GT.max_loc(i,j,iTr)) THEN
+           SwDr(i,j,k,iTr) = 1 _d 0
+          ELSE
+           SwDr(i,j,k,iTr) = 0 _d 0
+          ENDIF
+         ENDDO
+        ENDDO
+       ENDDO
+      ENDDO
+
+C Find DVM swim direction based on light and max food availability
+C Day
+C If PAR at top >0 (or above some level in future),
+C swim down (toward PARpref)
+C If PAR at top >0 and PARtot < PARpref, swim up
+C If PAR at top >0 and PARtot = PARpref, no swim
+
+C Night--see logic in SwDr above
+C If PAR at top 0 (or below some light level in future),
+C and prey available at that depth < food max, swim toward food max
+C If PAR at top 0 (or below some light level in future),
+C and prey available at that depth = food max, don't swim; stay put
+
+      DO k=1,Nr
+       DO j=jMin,jMax
+        DO i=iMin,iMax
+         sumPAR(i,j,k) = 0 _d 0
+        ENDDO
+       ENDDO
+      ENDDO
+      DO l=1,nlam
+       DO k=1,Nr
+        DO j=jMin,jMax
+         DO i=iMin,iMax
+          sumPAR(i,j,k) = sumPAR(i,j,k) + PAR(i,j,k,l)
+         ENDDO
+        ENDDO
+       ENDDO
+      ENDDO
+
+      DO iTr=1,nplank
+       DO k=1,Nr
+        DO j=jMin,jMax
+         DO i=iMin,iMax
+          IF (sumPAR(i,j,1) .GT. 0) THEN
+C          day
+           IF (sumPAR(i,j,k) .GT. PARpref(iTr)) THEN
+              bioswimDVMup(i,j,k,iTr) = 0 _d 0
+              bioswimDVMdn(i,j,k,iTr) = bioswimDVM(iTr)
+           ELSEIF (sumPAR(i,j,k). LT. PARpref(iTr)) THEN
+              bioswimDVMup(i,j,k,iTr) = bioswimDVM(iTr)
+              bioswimDVMdn(i,j,k,iTr) = 0 _d 0
+           ELSEIF (sumPAR(i,j,k) .EQ. PARpref(iTr)) THEN
+              bioswimDVMup(i,j,k,iTr) = 0 _d 0
+              bioswimDVMdn(i,j,k,iTr) = 0 _d 0
+           ENDIF
+          ELSE
+C          night
+           IF (SwDr(i,j,k,iTr) .GT. 0.0) THEN
+               bioswimDVMup(i,j,k,iTr) = bioswimDVM(iTr)
+               bioswimDVMdn(i,j,k,iTr) = 0 _d 0
+           ELSEIF (SwDr(i,j,k,iTr) .EQ. 0.0) THEN
+               bioswimDVMup(i,j,k,iTr) = 0 _d 0
+               bioswimDVMdn(i,j,k,iTr) = 0 _d 0
+           ELSE
+               bioswimDVMup(i,j,k,iTr) = 0 _d 0
+               bioswimDVMdn(i,j,k,iTr) = bioswimDVM(iTr)
+           ENDIF
+          ENDIF
+         ENDDO
+        ENDDO
+       ENDDO
+      ENDDO
+#else /* DARWIN_ALLOW_DVM */
+      DO iTr=1,nplank
+       DO k=1,Nr
+        DO j=jMin,jMax
+         DO i=iMin,iMax
+          bioswimDVMup(i,j,k,iTr) = 0 _d 0
+          bioswimDVMdn(i,j,k,iTr) = 0 _d 0
+         ENDDO
+        ENDDO
+       ENDDO
+      ENDDO
+#endif /* DARWIN_ALLOW_DVM */
+
+      CALL TIMER_STOP('DARWIN_DVM [DARWIN_FORCING]',myThid)
 
 C === pre-sinking diags ================================================
 #ifdef ALLOW_DIAGNOSTICS
@@ -997,8 +1128,9 @@ C     and rescale for nonlinear free surface if appropriate
 
 C === sinking ==========================================================
       CALL TIMER_START('DARWIN_SINKING [DARWIN_FORCING]',myThid)
-      CALL DARWIN_SINKING( Ptracer,gPtr,dTsub,bi,bj,iMin,iMax,jMin,jMax,
-     &                  subTime,myIter,myThid )
+      CALL DARWIN_SINKING( Ptracer,bioswimDVMup,bioswimDVMdn,
+     &                     gPtr,dTsub,bi,bj,
+     &                     iMin,iMax,jMin,jMax,subTime,myIter,myThid )
       CALL TIMER_STOP ('DARWIN_SINKING [DARWIN_FORCING]',myThid)
 
 C === apply tendencies to tracers ======================================
@@ -1126,6 +1258,12 @@ C      nutrient consumption diagnostics
      &           'rDIC_POC',0,Nr,2,bi,bj,myThid)
        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iDisscDIC_PIC),
      &           'dDIC_PIC',0,Nr,2,bi,bj,myThid)
+      CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,ifIphavg),'fIph_avg ',
+     &       0,Nr,2,bi,bj,myThid)
+      CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,ifTphavg),'fTph_avg ',
+     &       0,Nr,2,bi,bj,myThid)
+      CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,ifnutavg),'fnut_avg ',
+     &       0,Nr,2,bi,bj,myThid)
 #ifdef DARWIN_ALLOW_CARBON
        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iConsALK),'C_ALK   ',
      &       0,Nr,2,bi,bj,myThid)
@@ -1240,6 +1378,91 @@ C      diags(iCons*) for convenience
         CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,ilimS+iTr-1),
      &        diagname,0,Nr,2,bi,bj,myThid)
        ENDDO
+# ifdef DARWIN_MACROMOLECULAR_GROWTH
+       DO iTr=1,nPhoto
+        WRITE(diagname, '(A,I4.4)') 'PChl', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iPChl+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'VN', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iVN+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'VP', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iVP+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'MODE', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iMODE+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'Fe_C', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iFe_C+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'exQc', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iexQc+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'CChl', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iCChl+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'NChl', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iNChl+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'NPho', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iNPho+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'NSyn', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iNSyn+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'NPrn', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iNPrn+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'NRNA', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iNRNA+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'NDNA', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iNDNA+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'NSTO', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iNSTO+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'NEXC', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iNEXC+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'PRNA', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iPRNA+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'PDNA', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iPDNA+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'PTHY', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iPTHY+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'PCON', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iPCON+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'PSTO', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iPSTO+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'PEXC', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iPEXC+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'FPHO', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iFPHO+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'FSTO', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iFSTO+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'FEXC', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iFEXC+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'Y_RQ', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,iY_RQ+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'limC', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,ilimC+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+        WRITE(diagname, '(A,I4.4)') 'limL', iTr
+        CALL DIAGNOSTICS_FILL(diags(1-OLx,1-OLy,1,ilimL+iTr-1),diagname,
+     &          0,Nr,2,bi,bj,myThid)
+       ENDDO
+# endif
 #endif
 #ifdef DARWIN_ALLOW_CSTORE
 #ifdef DARWIN_ALLOW_CSTORE_DIAGS

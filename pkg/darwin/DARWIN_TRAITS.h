@@ -99,6 +99,7 @@ C     R_PICPOC           :: [mmol PIC (mmol POC)^-1]   inorganic-organic carbon 
 C
 C     biosink            :: [m s^-1]                   sinking velocity (positive downwards)
 C     bioswim            :: [m s^-1]                   upward swimming velocity (positive upwards)
+C     bioswimDVM         :: [m s^-1]                   swimming speed for diel vertically migrating plankton (pos. upwards)
 C
 C     respRate           :: [s^-1]                     respiration rate
 C     PCmax              :: [s^-1]                     maximum carbon-specific growth rate
@@ -162,6 +163,54 @@ C     ksatDON            :: [mmol N m^-3]   half-saturation of DON for bacterial
 C     ksatDOC            :: [mmol C m^-3]   half-saturation of DOC for bacterial growth
 C     ksatDOP            :: [mmol P m^-3]   half-saturation of DOP for bacterial growth
 C     ksatDOFe           :: [mmol Fe m^-3]  half-saturation of DOFe for bacterial growth
+C- PAR preference
+C     PARpref            :: [uEin m^-2 s^-1] preferred PAR isolume for determining DVM
+C- Light-mediated mortality for DVM
+C     mortmaxDVM         :: [s^-1]           maximum mortality rate related to PAR for DVM
+C     ksatDVM            :: [mmol C m^-3]    half saturation for DVM mortality
+C     ksatPARDVM         :: [uEin m^-2 s^-1] half sat for light limitation for DVM
+C     fracPARmort        :: []               fraction of mortality from light-dependent mortality
+C     ExportFracDVM      :: []               fraction of light-dep mortality from DVM to POM
+C
+C- MACROMOLECULAR_GROWTH parameters
+C     Y_CP_Plip          :: [molC molP^-1]   C/P molar ratio of thylacoid membrane
+C     Y_CN_protein       :: [molC molN^-1]   C/N molar ratio in protein
+C     Y_NC_chl           :: [molN molC^-1]   N/C molar ratio in chlorophyll
+C     Y_CN_cyano         :: [molC molN^-1]   C/N molar ratio of cyanophycin
+C     Y_PN_nucacid       :: [molP molN^-1]   P/N molar ratio of RNA
+C     Y_CN_DNA           :: [molC molN^-1]   C/N molar ratio of DNA
+C     Y_CN_RNA           :: [molC molN^-1]   C/N molar ratio of RNA
+C     Y_THY_P            :: [(molP)/(molC in chl)^-1] the stoichiometric ratio for cell phosphorus in thylakoid membrane to chlorophyll
+C     Y_FeN_photo        :: [molFe mol N^-1] Fe/N ratio in photosystem iron
+C     ECo2Prod           :: [dimensionless]  CO2 production ratio
+C     maintConsum        :: [s^-1]           maintenance carbohydrate consumption
+C     VI_max             :: [molC (molC in Chl)^-1 s^-1] carbon fixing rate
+C     A_I                :: [umol^-1 m2 s]   coefficient characterizing the absorption cross section
+C     QC_other           :: [molC molC^-1]   essential carbon (lipid membrane, etc.)
+C     QC_pro_other       :: [molC molC^-1]
+C     QP_other           :: [molP molC^-1]   constant part of phosphorus
+C     QP_RNA_min         :: [molP molC^-1]
+C     QC_DNA             :: [molC molC^-1]   constant part of DNA in carbon
+C     QN_pro_other       :: [molN molC^-1]
+C     QN_RNA_min         :: [molN molC^-1]   constant part of RNA in nitrogen
+C     QC_RNA_min         :: [molN molC^-1]   constant part of RNA in carbon
+C     QN_DNA             :: [molN molC^-1]   DNA in nitrogen
+C     QP_DNA             :: [molP molC^-1]   DNA in phosphorous
+C     QN_sto_max         :: [molN molC^-1]   maximum nitrogen storage
+C     Qp_max             :: [molP molC^-1]   maximum phosphorus quota
+C     Qfe_max            :: [molFe molC^-1]  maximum iron quota
+C     A_pho              :: [(molC)/(molC in chl)^-1] A constant of proportionalty
+C     A_bio              :: [molC molC^-1 s] constant for variable part of biosynthesis protein
+C     AP_RNA             :: [molP molC^-1 s] constant for Variable part of RNA
+C     AN_RNA             :: [molN molN^-1 s] constant for Variable part of RNA
+C     A_thy              :: [molC (molC in chl)^-1]
+C     Sf                 :: [unitless]       enhancement of photosynthesis due to size
+C     QC_const           :: [molC molC^-1]   constant portion of the cell
+C     VI_min             :: [molC (molC in Chl)^-1 s^-1] minimum photosynthesis rate
+C     QC_chlMax          :: [molC molC^-1]   maximum chlorophyll concentration at minimum light
+C     QnNoChl            :: [molN molC^-1]   minimum QN at zero growth rate
+C     QpNoChl            :: [molP molC^-1]   minimum QP at zero growth rate
+C     QfeNoChl           :: [molFe molC^-1]  minimum QFe at zero growth rate
       COMMON /DARWIN_TRAITS_r/
      &    Xmin,
      &    amminhib,
@@ -194,6 +243,7 @@ C     ksatDOFe           :: [mmol Fe m^-3]  half-saturation of DOFe for bacteria
      &    R_PICPOC,
      &    biosink,
      &    bioswim,
+     &    bioswimDVM,
      &    respRate,
      &    PCmax,
      &    Qnmax,
@@ -217,6 +267,10 @@ C     ksatDOFe           :: [mmol Fe m^-3]  half-saturation of DOFe for bacteria
      &    ksatPO4,
      &    ksatSiO2,
      &    ksatFeT,
+     &    hillnumDIN,
+     &    hillnumPO4,
+     &    hillnumFeT,
+     &    hillnumSiO2,
      &    kexcc,
      &    kexcn,
      &    kexcp,
@@ -245,7 +299,53 @@ C     ksatDOFe           :: [mmol Fe m^-3]  half-saturation of DOFe for bacteria
      &    ksatDON,
      &    ksatDOC,
      &    ksatDOP,
-     &    ksatDOFe
+     &    ksatDOFe,
+     &    PARpref,
+     &    mortmaxDVM,
+     &    ksatDVM,
+     &    ksatPARDVM,
+     &    fracPARmort,
+     &    ExportFracDVM
+#ifdef DARWIN_MACROMOLECULAR_GROWTH
+     &   ,Y_CN_protein,
+     &    Y_CP_Plip,
+     &    Y_NC_chl,
+     &    Y_CN_cyano,
+     &    Y_PN_nucacid,
+     &    Y_CN_DNA,
+     &    Y_CN_RNA,
+     &    Y_THY_P,
+     &    Y_FeN_photo,
+     &    ECo2Prod,
+     &    maintConsum,
+     &    VI_max,
+     &    A_I,
+     &    QC_other,
+     &    QC_pro_other,
+     &    QP_other,
+     &    QP_RNA_min,
+     &    QC_DNA,
+     &    QN_pro_other,
+     &    QN_RNA_min,
+     &    QC_RNA_min,
+     &    QN_DNA,
+     &    QP_DNA,
+     &    QN_sto_max,
+     &    Qp_max,
+     &    Qfe_max,
+     &    A_pho,
+     &    A_bio,
+     &    AP_RNA,
+     &    AN_RNA,
+     &    A_thy,
+     &    Sf,
+     &    VI_min,
+     &    QC_chlMax,
+     &    QnNoChl,
+     &    QpNoChl,
+     &    QfeNoChl,
+     &    QC_const
+#endif
       _RL Xmin(nplank)
       _RL amminhib(nplank)
       _RL acclimtimescl(nplank)
@@ -277,6 +377,7 @@ C     ksatDOFe           :: [mmol Fe m^-3]  half-saturation of DOFe for bacteria
       _RL R_PICPOC(nplank)
       _RL biosink(nplank)
       _RL bioswim(nplank)
+      _RL bioswimDVM(nplank)
       _RL respRate(nplank)
       _RL PCmax(nplank)
       _RL Qnmax(nplank)
@@ -300,6 +401,10 @@ C     ksatDOFe           :: [mmol Fe m^-3]  half-saturation of DOFe for bacteria
       _RL ksatPO4(nplank)
       _RL ksatSiO2(nplank)
       _RL ksatFeT(nplank)
+      _RL hillnumDIN(nplank)
+      _RL hillnumPO4(nplank)
+      _RL hillnumFeT(nplank)
+      _RL hillnumSiO2(nplank)
       _RL kexcc(nplank)
       _RL kexcn(nplank)
       _RL kexcp(nplank)
@@ -329,6 +434,52 @@ C     ksatDOFe           :: [mmol Fe m^-3]  half-saturation of DOFe for bacteria
       _RL ksatDOC(nplank)
       _RL ksatDOP(nplank)
       _RL ksatDOFe(nplank)
+      _RL PARpref(nplank)
+      _RL mortmaxDVM(nplank)
+      _RL ksatDVM(nplank)
+      _RL ksatPARDVM(nplank)
+      _RL fracPARmort(nplank)
+      _RL ExportFracDVM(nplank)
+#ifdef DARWIN_MACROMOLECULAR_GROWTH
+      _RL Y_CN_protein(nplank)
+      _RL Y_CP_Plip(nplank)
+      _RL Y_NC_chl(nplank)
+      _RL Y_CN_cyano(nplank)
+      _RL Y_PN_nucacid(nplank)
+      _RL Y_CN_DNA(nplank)
+      _RL Y_CN_RNA(nplank)
+      _RL Y_THY_P(nplank)
+      _RL Y_FeN_photo(nplank)
+      _RL ECo2Prod(nplank)
+      _RL maintConsum(nplank)
+      _RL VI_max(nplank)
+      _RL A_I(nplank)
+      _RL QC_other(nplank)
+      _RL QC_pro_other(nplank)
+      _RL QP_other(nplank)
+      _RL QP_RNA_min(nplank)
+      _RL QC_DNA(nplank)
+      _RL QN_pro_other(nplank)
+      _RL QN_RNA_min(nplank)
+      _RL QC_RNA_min(nplank)
+      _RL QN_DNA(nplank)
+      _RL QP_DNA(nplank)
+      _RL QN_sto_max(nplank)
+      _RL Qp_max(nplank)
+      _RL Qfe_max(nplank)
+      _RL A_pho(nplank)
+      _RL A_bio(nplank)
+      _RL AP_RNA(nplank)
+      _RL AN_RNA(nplank)
+      _RL A_thy(nplank)
+      _RL Sf(nplank)
+      _RL VI_min(nplank)
+      _RL QC_chlMax(nplank)
+      _RL QnNoChl(nplank)
+      _RL QpNoChl(nplank)
+      _RL QfeNoChl(nplank)
+      _RL QC_const(nplank)
+#endif
 
 C--   COMMON /DARWIN_DEPENDENT_TRAITS_i/ Dependent and constant (not read-in) parameters
 C     group  :: which group this type belongs to
