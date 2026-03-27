@@ -453,6 +453,11 @@ C     yonh4             :: []              not implemented (for ammonia-oxidizin
 C     fno2              :: []              not implemented (for nitrite-oxidizing bacteria)
 C     yno2              :: []              not implemented (for nitrite-oxidizing bacteria)
 C     yono2             :: []              not implemented (for nitrite-oxidizing bacteria)
+C- Cstore
+C     k1_per            :: []              coefficient of PAR to calculate PER
+C     k2_per            :: []              coefficient of NH4 to calculate PER
+C     k3_per            :: []              coefficient of NO3 to calculate PER
+C     k4_per            :: []              coefficient of PO4 to calculate PER
 C
 C- To be implemented
 C     depthdenit        :: [m]             not implemented (depth for denitrification relaxation to start)
@@ -578,6 +583,12 @@ C     &    fno2,
 C     &    yno2,
 C     &    yono2,
      &    depthdenit
+#ifdef DARWIN_ALLOW_CSTORE
+     &    k1_per,
+     &    k2_per,
+     &    k3_per,
+     &    k4_per,
+#endif
       _RL katten_w
       _RL katten_chl
       _RL parfrac
@@ -699,6 +710,12 @@ C      _RL fno2
 C      _RL yno2
 C      _RL yono2
       _RL depthdenit
+#ifdef DARWIN_ALLOW_CSTORE
+      _RL k1_per
+      _RL k2_per
+      _RL k3_per
+      _RL k4_per
+#endif
 
 #ifdef DARWIN_SOLVESAPHE
 C If using Solvesaphe routines (Munhoven, 2013) then in addition,

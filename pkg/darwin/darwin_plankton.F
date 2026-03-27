@@ -7,7 +7,8 @@ C !INTERFACE: ==========================================================
      I     Ptr,
      U     gTr,
      O     chlout, diags, sumprey,
-     I     PAR, photoTempFunc, hetTempFunc, grazTempFunc, reminTempFunc,
+     I     PAR, Temp, 
+     I     photoTempFunc, hetTempFunc, grazTempFunc, reminTempFunc,
      I     mortTempFunc, mort2TempFunc,
      I     uptakeTempFunc, macromolTempFunc,
      I     omegaCl,
@@ -31,11 +32,13 @@ C !INPUT PARAMETERS: ===================================================
 C  Ptr    :: darwin model tracers
 C  PAR    :: PAR in uEin/s/m2
 C         :: either non-spectral (tlam=1) or waveband total
+C  Temp   :: Temperature
 C  myTime :: current time
 C  myIter :: current iteration number
 C  myThid :: thread number
       _RL Ptr(nDarwin)
       _RL PAR(nlam)
+      _RL Temp
       _RL photoTempFunc(nplank)
       _RL hetTempFunc(nplank)
       _RL reminTempFunc
@@ -350,6 +353,7 @@ C@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
       _RL excretC
       _RL excC
       _RL storeC
+      _RL PER
 #endif
 
 C for grazing
@@ -1158,9 +1162,12 @@ C photosynthesis.  To decide the minimum of C demand by the four
 C elements (N, P, Si, Fe), Dmd_XC is the maximum carbon-specific
 C photosynthesis rate convertible into biomass when X is the limiting
 C nutrient as computed above.
-        growth = MIN(uptakeDIC, Dmd_min)
-        excretC = MAX(0 _d 0, uptakeDIC - growth)*FracExudeC(j)
+        PER = k1_per * PARtot - k2_per * Temp + k3_per * NO3 +
+                k4_per * PO4 
+        PER =  MIN(1.0 _d 0, MAX(0.0 _d 0, PER))
+        excretC = uptakeDIC * PER
         excC = excC + excretC
+        growth = MIN(uptakeDIC - excretC, Dmd_min)
         storeC = uptakeDIC - growth - excretC
 #else /* without CSTORE */
         growth = uptakeDIC
