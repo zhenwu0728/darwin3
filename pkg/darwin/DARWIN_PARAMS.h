@@ -583,13 +583,13 @@ C     &    yonh4,
 C     &    fno2,
 C     &    yno2,
 C     &    yono2,
-     &    depthdenit
+     &    depthdenit,
 #ifdef DARWIN_ALLOW_CSTORE
      &    k0_per,
      &    k1_per,
      &    k2_per,
      &    k3_per,
-     &    k4_per,
+     &    k4_per
 #endif
       _RL katten_w
       _RL katten_chl
