@@ -454,6 +454,7 @@ C     fno2              :: []              not implemented (for nitrite-oxidizin
 C     yno2              :: []              not implemented (for nitrite-oxidizing bacteria)
 C     yono2             :: []              not implemented (for nitrite-oxidizing bacteria)
 C- Cstore
+C     k0_per            :: []              intercept to calculate PER
 C     k1_per            :: []              coefficient of PAR to calculate PER
 C     k2_per            :: []              coefficient of NH4 to calculate PER
 C     k3_per            :: []              coefficient of NO3 to calculate PER
@@ -584,6 +585,7 @@ C     &    yno2,
 C     &    yono2,
      &    depthdenit
 #ifdef DARWIN_ALLOW_CSTORE
+     &    k0_per,
      &    k1_per,
      &    k2_per,
      &    k3_per,
@@ -711,6 +713,7 @@ C      _RL yno2
 C      _RL yono2
       _RL depthdenit
 #ifdef DARWIN_ALLOW_CSTORE
+      _RL k0_per
       _RL k1_per
       _RL k2_per
       _RL k3_per

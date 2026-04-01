@@ -251,6 +251,7 @@ C     &    yno2,
 C     &    yono2,
      &    depthdenit
 #ifdef DARWIN_ALLOW_CSTORE
+     &    k0_per
      &    k1_per
      &    k2_per
      &    k3_per
@@ -582,6 +583,7 @@ C      yno2 = 1/(16+563/2/fno2)*106 _d 0
 C      yono2 = fno2/563*4/(1-fno2)*106 _d 0
       depthdenit = 185.0 _d 0
 #ifdef DARWIN_ALLOW_CSTORE
+      k0_per = 0.0 _d 0 
       k1_per = 0.0 _d 0 
       k2_per = 0.0 _d 0 
       k3_per = 0.0 _d 0 
