@@ -1162,12 +1162,12 @@ C photosynthesis.  To decide the minimum of C demand by the four
 C elements (N, P, Si, Fe), Dmd_XC is the maximum carbon-specific
 C photosynthesis rate convertible into biomass when X is the limiting
 C nutrient as computed above.
-        PER = k0_per + k1_per * PARtot - k2_per * Temp + 
-     &          k3_per * NO3 + k4_per * LOG(PO4) 
+        PER = k0_per + k1_per*PARtot + k2_per*Temp + 
+     &          k3_per*NO3 + k4_per*PO4 
         PER =  MIN(1.0 _d 0, MAX(0.0 _d 0, PER))
         excretC = uptakeDIC * PER
         excC = excC + excretC
-        growth = MIN(uptakeDIC - excretC, Dmd_min)
+        growth = MIN(uptakeDIC*(1.0 _d 0 - PER), Dmd_min)
         storeC = uptakeDIC - growth - excretC
 #else /* without CSTORE */
         growth = uptakeDIC
