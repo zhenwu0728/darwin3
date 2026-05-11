@@ -249,14 +249,15 @@ C     &    yonh4,
 C     &    fno2,
 C     &    yno2,
 C     &    yono2,
-     &    depthdenit,
 #ifdef DARWIN_ALLOW_CSTORE
      &    k0_per,
      &    k1_per,
      &    k2_per,
      &    k3_per,
-     &    k4_per
+     &    k4_per,
+     &    k5_per,
 #endif
+     &    depthdenit
 
 #ifdef DARWIN_ALLOW_CDOM
       NAMELIST/DARWIN_CDOM_PARAMS/
@@ -581,14 +582,15 @@ C      yonh4 = fnh4/467*4/(1-fnh4)*106 _d 0
 C      fno2 = 0.1 _d 0
 C      yno2 = 1/(16+563/2/fno2)*106 _d 0
 C      yono2 = fno2/563*4/(1-fno2)*106 _d 0
-      depthdenit = 185.0 _d 0
 #ifdef DARWIN_ALLOW_CSTORE
       k0_per = 0.0 _d 0 
       k1_per = 0.0 _d 0 
       k2_per = 0.0 _d 0 
       k3_per = 0.0 _d 0 
       k4_per = 0.0 _d 0 
+      k5_per = 0.0 _d 0 
 # endif
+      depthdenit = 185.0 _d 0
 
       READ(UNIT=iUnit, NML=DARWIN_PARAMS)
 
