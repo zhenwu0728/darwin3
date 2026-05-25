@@ -28,46 +28,38 @@ C enable silica quotas for all plankton
 #undef  DARWIN_ALLOW_SIQUOTA
 
 C enable chlorophyll quotas for all phototrophs
-#undef  DARWIN_ALLOW_CHLQUOTA
+#define DARWIN_ALLOW_CHLQUOTA
 
 C enable PIFe tracer
-#undef  DARWIN_ALLOW_PIFE
+#define DARWIN_ALLOW_PIFE
 
-C enable internal c store for all phototrophs; also enables exudation
-#undef  DARWIN_ALLOW_CSTORE
-#undef  DARWIN_ALLOW_CSTORE_DIAGS
+C enable internal c store and exudation for all phototrophs
+#define DARWIN_ALLOW_CSTORE
+#define DARWIN_ALLOW_CSTORE_DIAGS
 
 C enable a dynamic CDOM tracer
-#undef  DARWIN_ALLOW_CDOM
+#define DARWIN_ALLOW_CDOM
 
 C enable air-sea carbon exchange and Alk and O2 tracers
-#undef  DARWIN_ALLOW_CARBON
+#define DARWIN_ALLOW_CARBON
 
 C consistently use the total pH scale for carbon chemistry coefficients
 #undef  DARWIN_TOTALPHSCALE
 
-C Compile Munhoven (2013) "Solvesaphe" package for pH/pCO2
-C  can still select Follows et al (2006) solver in data.darwin,
-C  but will use solvesaphe dissociation coefficient options.
-#undef  DARWIN_SOLVESAPHE
-
 C this needs to be defined for coupling to atmospheric model:
 #undef  DARWIN_USE_PLOAD
-
-C enable macromolecular growth code; requires N, P and Fe quotas
-#undef DARWIN_MACROMOLECULAR_GROWTH
 
 
 C optional bits
 
 C enable denitrification code
-#undef  DARWIN_ALLOW_DENIT
+#define DARWIN_ALLOW_DENIT
 
 C enable separate exudation of individual elements
 #undef  DARWIN_ALLOW_EXUDE
 
 C enable old virtualflux code for DIC and Alk
-#undef  ALLOW_OLD_VIRTUALFLUX
+#define ALLOW_OLD_VIRTUALFLUX
 
 C reduce nitrate uptake by iron limitation factor
 C only effective with both nitrogen and iron quota
@@ -79,19 +71,10 @@ C allow organic matter to sink into bottom (sedimentize)
 #undef  DARWIN_BOTTOM_SINK
 
 C CDOM is in carbon units and follows POC
-#define DARWIN_CDOM_UNITS_CARBON
+#undef  DARWIN_CDOM_UNITS_CARBON
 
 C include code for reading nutrient runoff from files
 #undef  DARWIN_NUTRIENT_RUNOFF
-
-C enable RADI sediment metamodel v1 (requires DARWIN_BOTTOM_SINK)
-#undef DARWIN_ALLOW_RADIv1
-
-C enable RADI sediment metamodel v2 (requires DARWIN_BOTTOM_SINK)
-#undef DARWIN_ALLOW_RADIv2
-
-C include diel vertical migration code
-#undef  DARWIN_ALLOW_DVM
 
 
 C light
@@ -101,10 +84,10 @@ C (ignored when radtrans package is used)
 #undef  DARWIN_AVPAR
 
 C enable GEIDER light code
-#undef  DARWIN_ALLOW_GEIDER
+#define DARWIN_ALLOW_GEIDER
 
 C use rho instead of acclimated Chl:C for chlorophyll synthesis
-#undef  DARWIN_GEIDER_RHO_SYNTH
+#define DARWIN_GEIDER_RHO_SYNTH
 
 C initialize chl as in darwin2 (with radtrans package)
 #undef  DARWIN_CHL_INIT_LEGACY
@@ -134,7 +117,7 @@ C turn off all temperature dependence
 #undef  DARWIN_NOTEMP
 
 C select temperature version: 1, 2 or 3
-#define DARWIN_TEMP_VERSION 1
+#define DARWIN_TEMP_VERSION 2
 
 C restrict phytoplankton growth to a temperature range
 #undef  DARWIN_TEMP_RANGE
@@ -146,10 +129,10 @@ C restrict maximum free iron
 #define DARWIN_MINFE
 
 C enable particle scavenging code
-#undef  DARWIN_PART_SCAV
+#define DARWIN_PART_SCAV
 
 C enable variable iron sediment source
-#undef  DARWIN_IRON_SED_SOURCE_VARIABLE
+#define DARWIN_IRON_SED_SOURCE_VARIABLE
 
 C revert to old variable iron sediment source in terms of POP
 #undef  DARWIN_IRON_SED_SOURCE_POP
@@ -161,13 +144,13 @@ C add iron source from hydrothermal vents
 C diagnostics
 
 C include code for per-type diagnostics
-#undef  DARWIN_DIAG_PERTYPE
+#define DARWIN_DIAG_PERTYPE
 
 
 C debugging
 
 C turn on debugging output
-#undef DARWIN_DEBUG
+#define DARWIN_DEBUG
 
 C compute and print global element totals
 #define DARWIN_ALLOW_CONS
