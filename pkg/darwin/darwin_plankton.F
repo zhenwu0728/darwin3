@@ -108,6 +108,14 @@ c !LOCAL VARIABLES: ====================================================
       _RL MM_PO4
       _RL MM_SiO2
       _RL MM_FeT
+      _RL phytoSA
+      _RL VFeSA
+      _RL ksaFeT
+      _RL ksaFeTLower
+      _RL ksaFeTUpper
+      PARAMETER ( ksaFeT      = 2.569444444444444 _d -17 )
+      PARAMETER ( ksaFeTLower = 2.972222222222222 _d -20 )
+      PARAMETER ( ksaFeTUpper = 2.569444444444444 _d -17 )
       _RL MM_NH4
       _RL MM_NO2
       _RL MM_NO3
@@ -950,10 +958,11 @@ c       linear limitation
 
 c iron
         IF (ksatFeT(j) .GT. 0 _d 0) THEN
-          MM_FeT = FeT/(FeT + ksatFeT(j))
-        ELSE
-          MM_FeT = 1 _d 0
-        ENDIF
+       MM_FeT = FeT/(FeT + ksatFeT(j))
+      ELSE
+       MM_FeT = 1 _d 0
+      ENDIF
+
 #ifdef DARWIN_ALLOW_FEQUOTA
         regQfe = MAX(0 _d 0, MIN(1 _d 0, (Qfemax(j)-Qfe(j))/
      &                                   (Qfemax(j)-Qfemin(j)) ))
@@ -966,7 +975,14 @@ c       normalized Droop limitation
 C iron limit is applied in Geider
 # ifdef DARWIN_ALLOW_CSTORE
         IF (R_FeC(j) .GT. 0 _d 0) THEN
-          Dmd_FeC = vmaxFeT(j)*MM_FeT*uptakeTempFunc*X(j)/R_FeC(j)
+         phytoSA =
+     &   (36.0 _d 0*3.141592653589793 _d 0)
+     &   **(1.0 _d 0/3.0 _d 0)
+     &   * biovol(j)**(2.0 _d 0/3.0 _d 0)
+
+          VFeSA = ksaFeT*phytoSA*FeT/qcarbon(j)
+          
+          Dmd_FeC = VFeSA*uptakeTempFunc*X(j)/R_FeC(j)
           Dmd_min = MIN(Dmd_min, Dmd_FeC)
         ELSE
           Dmd_FeC = 0 _d 0
